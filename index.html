@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Linked List Visualizer</title>
+    <style>
+        /* CSS: Definitions for the dark theme and layout */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a1a;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        h1 { margin-top: 20px; }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            margin-top: 30px;
+            align-items: center;
+            width: 95%;
+        }
+
+        /* Controls Section */
+        .controls {
+            background-color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 900px;
+        }
+
+        input {
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            font-size: 16px;
+            background-color: #eee;
+        }
+
+        /* Specific widths for inputs */
+        #inputVal { width: 100px; }
+        #inputPos { width: 80px; }
+
+        button {
+            padding: 10px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+            font-weight: bold;
+            color: white;
+        }
+
+        /* --- Button Colors --- */
+        .btn-head { background-color: #4CAF50; } 
+        .btn-head:hover { background-color: #45a049; }
+
+        .btn-tail { background-color: #2196F3; } 
+        .btn-tail:hover { background-color: #1976D2; }
+
+        /* PURPLE for Index Operations */
+        .btn-pos { background-color: #9C27B0; } 
+        .btn-pos:hover { background-color: #7B1FA2; }
+
+        .btn-del-val { background-color: #FF9800; color: black; } 
+        .btn-del-val:hover { background-color: #e68900; }
+
+        .btn-del-head { background-color: #ef5350; } 
+        .btn-del-head:hover { background-color: #e53935; }
+
+        .btn-del-tail { background-color: #c62828; } 
+        .btn-del-tail:hover { background-color: #b71c1c; }
+
+        .separator {
+            border-left: 1px solid #666; 
+            height: 35px; 
+            margin: 0 10px;
+        }
+
+        .message-box {
+            margin-top: 10px;
+            padding: 10px;
+            background: #222;
+            border-left: 5px solid #4CAF50;
+            font-size: 14px;
+            min-height: 20px;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* The Linked List Container */
+        .list-container {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            min-height: 100px;
+            min-width: 300px;
+            overflow-x: auto; 
+            max-width: 100%;
+        }
+
+        .node-wrapper {
+            display: flex;
+            align-items: center;
+            animation: slideIn 0.4s ease-out;
+            position: relative; /* For index label */
+        }
+
+        /* Small Index Number above node */
+        .index-label {
+            position: absolute;
+            top: -20px;
+            left: 20px;
+            font-size: 10px;
+            color: #aaa;
+        }
+
+        .node {
+            width: 60px;
+            height: 60px;
+            background-color: #FF9800; 
+            color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 18px;
+            border-radius: 50%; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            border: 2px solid #fff;
+            position: relative;
+        }
+
+        .arrow {
+            font-size: 30px;
+            color: white;
+            margin: 0 10px;
+            font-weight: bold;
+        }
+
+        .null-block {
+            padding: 10px 15px;
+            border: 2px dashed #aaa;
+            color: #aaa;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .highlight-del {
+            background-color: #f44336 !important;
+            transform: scale(1.1);
+            transition: 0.3s;
+        }
+
+        @keyframes slideIn {
+            0% { transform: translateX(-20px); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>Master Linked List Visualizer</h1>
+
+    <div class="container">
+        
+        <div class="controls">
+            <input type="number" id="inputVal" placeholder="Value" />
+            <input type="number" id="inputPos" placeholder="Index" title="Position (0, 1, 2...)" />
+            
+            <div class="separator"></div>
+
+            <button class="btn-head" onclick="insertHead()">Add Head</button>
+            <button class="btn-tail" onclick="insertTail()">Add Tail</button>
+            <button class="btn-pos" onclick="insertAtPos()">Add at Index</button>
+            
+            <div class="separator"></div>
+
+            <button class="btn-del-head" onclick="deleteHead()">Del Head</button>
+            <button class="btn-del-tail" onclick="deleteTail()">Del Tail</button>
+            <button class="btn-del-val" onclick="deleteValue()">Del Val</button>
+        </div>
+        
+        <div class="message-box" id="msgBox">List is empty.</div>
+
+        <div class="list-container" id="listCanvas">
+            <div class="null-block" id="nullBlock">NULL</div>
+        </div>
+
+    </div>
+
+    <script>
+        const listCanvas = document.getElementById('listCanvas');
+        const nullBlock = document.getElementById('nullBlock');
+        const inputVal = document.getElementById('inputVal');
+        const inputPos = document.getElementById('inputPos'); // New Input
+        const msgBox = document.getElementById('msgBox');
+
+        function log(message, color = '#4CAF50') {
+            msgBox.innerText = message;
+            msgBox.style.borderLeftColor = color;
+        }
+
+        function createNodeElement(val) {
+            const wrapper = document.createElement('div');
+            wrapper.classList.add('node-wrapper');
+            wrapper.setAttribute('data-value', val);
+
+            const node = document.createElement('div');
+            node.classList.add('node');
+            node.innerText = val;
+
+            const arrow = document.createElement('div');
+            arrow.classList.add('arrow');
+            arrow.innerHTML = '&#10140;'; 
+            
+            // Add Index Label (Optional, but helpful for students)
+            const idxLabel = document.createElement('div');
+            idxLabel.classList.add('index-label');
+            wrapper.appendChild(idxLabel);
+
+            wrapper.appendChild(node);
+            wrapper.appendChild(arrow);
+            return wrapper;
+        }
+
+        // Helper to update small index numbers visually
+        function updateIndices() {
+            const nodes = document.querySelectorAll('.node-wrapper');
+            nodes.forEach((node, index) => {
+                const label = node.querySelector('.index-label');
+                if(label) label.innerText = index;
+            });
+        }
+
+        // --- INSERT OPERATIONS ---
+
+        function insertHead() {
+            const val = inputVal.value;
+            if (val === "") { log("Enter a value.", "#FF9800"); return; }
+            
+            const newNode = createNodeElement(val);
+            listCanvas.insertBefore(newNode, listCanvas.firstChild);
+            
+            updateIndices();
+            log(`Inserted ${val} at Head.`);
+            inputVal.value = "";
+        }
+
+        function insertTail() {
+            const val = inputVal.value;
+            if (val === "") { log("Enter a value.", "#FF9800"); return; }
+
+            const newNode = createNodeElement(val);
+            listCanvas.insertBefore(newNode, nullBlock);
+            
+            updateIndices();
+            log(`Inserted ${val} at Tail.`);
+            inputVal.value = "";
+        }
+
+        // NEW: INSERT AT POSITION
+        function insertAtPos() {
+            const val = inputVal.value;
+            const pos = parseInt(inputPos.value);
+            
+            // 1. Validation
+            if (val === "") { log("Enter a value.", "#FF9800"); return; }
+            if (isNaN(pos) || pos < 0) { log("Enter a valid positive index.", "#FF9800"); return; }
+
+            // Get current size (excluding NULL block)
+            const currentSize = listCanvas.childElementCount - 1;
+
+            if (pos > currentSize) {
+                log(`Index ${pos} out of bounds! Current size: ${currentSize}`, "#f44336");
+                return;
+            }
+
+            // 2. Logic
+            if (pos === 0) {
+                insertHead(); // Reuse function
+                return;
+            } else if (pos === currentSize) {
+                insertTail(); // Reuse function
+                return;
+            } else {
+                // Insert somewhere in the middle
+                const newNode = createNodeElement(val);
+                
+                // Find the node currently at that position
+                // listCanvas.children gives us all nodes. Index matches perfectly.
+                const referenceNode = listCanvas.children[pos]; 
+                
+                listCanvas.insertBefore(newNode, referenceNode);
+                
+                updateIndices();
+                log(`Inserted ${val} at Index ${pos}.`, "#9C27B0");
+                inputVal.value = "";
+                inputPos.value = "";
+            }
+        }
+
+        // --- DELETE OPERATIONS ---
+
+        function deleteHead() {
+            if (listCanvas.children.length <= 1) { log("List is empty!", "#f44336"); return; }
+
+            const firstNode = listCanvas.firstElementChild;
+            firstNode.querySelector('.node').classList.add('highlight-del');
+            
+            setTimeout(() => {
+                listCanvas.removeChild(firstNode);
+                updateIndices();
+                log("Deleted Head.", "#f44336");
+            }, 300);
+        }
+
+        function deleteTail() {
+             if (listCanvas.children.length <= 1) { log("List is empty!", "#f44336"); return; }
+
+            const tailNode = nullBlock.previousElementSibling;
+            tailNode.querySelector('.node').classList.add('highlight-del');
+
+            setTimeout(() => {
+                listCanvas.removeChild(tailNode);
+                updateIndices();
+                log("Deleted Tail.", "#f44336");
+            }, 300);
+        }
+
+        function deleteValue() {
+            const val = inputVal.value;
+            if (val === "") { log("Enter value to delete.", "#FF9800"); return; }
+
+            const nodes = document.querySelectorAll('.node-wrapper');
+            let found = false;
+
+            for (let wrapper of nodes) {
+                if (wrapper.getAttribute('data-value') === val) {
+                    wrapper.querySelector('.node').classList.add('highlight-del');
+                    setTimeout(() => {
+                        listCanvas.removeChild(wrapper);
+                        updateIndices();
+                    }, 300);
+                    found = true;
+                    log(`Deleted value ${val}.`, "#f44336");
+                    break; 
+                }
+            }
+            if (!found) log(`Value ${val} not found.`, "#FF9800");
+            inputVal.value = "";
+        }
+        
+    </script>
+</body>
+</html>
